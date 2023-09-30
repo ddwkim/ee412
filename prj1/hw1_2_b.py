@@ -4,6 +4,7 @@ THRS = 100
 
 
 def main():
+    # read file
     with open(sys.argv[1], "r") as f:
         lines = f.readlines()
 
@@ -13,6 +14,7 @@ def main():
     int2name = {i: item for i, item in enumerate(names)}
     name2int = {item: i for i, item in enumerate(names)}
 
+    # get frequent items
     counts1 = [0] * len(names)
     for bascket in basckets:
         for item in bascket:
@@ -25,6 +27,8 @@ def main():
 
     print(len(l1))
 
+    # get frequent pairs, use triangular matrix method
+    # use offsets to calculate index
     counts2 = [0] * (len(l1) * (len(l1) - 1) // 2)
     offsets = [sum(range(len(l1) - 1, len(l1) - 1 - i, -1)) for i in range(len(l1) - 1)]
     for bascket in basckets:
@@ -44,6 +48,7 @@ def main():
 
     print(len(l2))
 
+    # print
     for idx, count in l2[:10]:
         for i, off in enumerate(offsets[::-1]):
             if idx >= off:

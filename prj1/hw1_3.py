@@ -10,6 +10,9 @@ N = B * R
 
 
 def isprime(n):
+    """
+    check if n is a prime number
+    """
     for i in range(2, int(n**0.5) + 1):
         if n % i == 0:
             return False
@@ -17,12 +20,16 @@ def isprime(n):
 
 
 def gethash(c):
+    """
+    get a hash function
+    """
     a = np.random.randint(1, c)
     b = np.random.randint(0, c)
     return lambda x: (a * x + b) % c
 
 
 def main():
+    # read file
     with open(sys.argv[1], "r") as f:
         lines = f.readlines()
 
@@ -30,6 +37,7 @@ def main():
     articles = [[doc[0], re.sub(REEXP, "", doc[1]).lower()] for doc in articles]
     articles = [[doc[0], " ".join(doc[1].split())] for doc in articles]
 
+    # get shigles
     shigles = []
     shiglesall = set()
     for doc in articles:
@@ -45,6 +53,7 @@ def main():
     while not isprime(c):
         c += 1
 
+    # get signatures
     hashfuncs = [gethash(c) for _ in range(N)]
     signatures = []
     for doc in shigles:
@@ -56,6 +65,7 @@ def main():
                     minhash = min(minhash, hashfuncs[i](shigle2id[shingle]))
             signatures[-1].append(minhash)
 
+    # get candidates
     candidates = []
     for i in range(len(signatures)):
         for j in range(i + 1, len(signatures)):
@@ -67,6 +77,7 @@ def main():
                     candidates.append((i, j))
                     break
 
+    # get results
     results = []
     for i, j in candidates:
         sigi, sigj = signatures[i], signatures[j]

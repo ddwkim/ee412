@@ -4,6 +4,7 @@ THRS = 100
 
 
 def main():
+    # read file
     with open(sys.argv[1], "r") as f:
         lines = f.readlines()
 
@@ -13,6 +14,7 @@ def main():
     int2name = {i: item for i, item in enumerate(names)}
     name2int = {item: i for i, item in enumerate(names)}
 
+    # get frequent items
     single2count = {}
     for bascket in basckets:
         for item in bascket:
@@ -20,6 +22,7 @@ def main():
                 single2count[name2int[item]] = 0
             single2count[name2int[item]] += 1
 
+    # get frequent pairs
     pair2count = {}
     for bascket in basckets:
         for i, item1 in enumerate(bascket):
@@ -32,6 +35,7 @@ def main():
                             pair2count[pair] = 0
                         pair2count[pair] += 1
 
+    # get frequent triples
     triple2count = {}
     for bascket in basckets:
         for i, item1 in enumerate(bascket):
@@ -56,6 +60,7 @@ def main():
                                 triple2count[triple] = 0
                             triple2count[triple] += 1
 
+    # print
     results = sorted(
         [(triple, count) for triple, count in triple2count.items()],
         key=lambda x: (-x[1], x[0]),
