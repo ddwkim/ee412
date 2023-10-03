@@ -47,6 +47,7 @@ def main():
                             name2int[item2],
                             name2int[item3],
                         )
+                        id1, id2, id3 = sorted([id1, id2, id3])
                         if (
                             (id1, id2) in pair2count
                             and pair2count[(id1, id2)] >= THRS
