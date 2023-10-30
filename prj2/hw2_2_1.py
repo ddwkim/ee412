@@ -22,28 +22,28 @@ def main():
     eigvec = power_iteration(A, B, nsim=100)
     eigval = np.dot(np.dot(A, eigvec), eigvec)
 
-    print("eigvec: ", eigvec)
-    print("eigval: ", eigval)
+    print("eigvec: ", np.around(eigvec, decimals=3))
+    print("eigval: ", np.around(eigval, decimals=3))
 
     # second eigenvalue
     A1 = A - eigval * np.outer(eigvec, eigvec)
-    print("A: ", A1)
+    print("A: ", np.around(A1, decimals=3))
 
     eigvec = power_iteration(A1, B, nsim=100)
     eigval = np.dot(np.dot(A1, eigvec), eigvec)
 
-    print("eigvec: ", eigvec)
-    print("eigval: ", eigval)
+    print("eigvec: ", np.around(eigvec, decimals=3))
+    print("eigval: ", np.around(eigval, decimals=3))
 
     # third eigenvalue
     A2 = A1 - eigval * np.outer(eigvec, eigvec)
-    print("A: ", A2)
+    print("A: ", np.around(A2, decimals=3))
 
     eigvec = power_iteration(A2, B, nsim=100)
     eigval = np.dot(np.dot(A2, eigvec), eigvec)
 
-    print("eigvec: ", eigvec)
-    print("eigval: ", eigval)
+    print("eigvec: ", np.around(eigvec, decimals=3))
+    print("eigval: ", np.around(eigval, decimals=3))
 
 
 if __name__ == "__main__":

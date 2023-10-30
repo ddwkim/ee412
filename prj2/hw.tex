@@ -70,77 +70,78 @@ Where the clustroid becomes aaaaaaaa with the minimum of 15.
 Following is the code for the problem.
 
 \begin{lstlisting}[language=Python]
-import numpy as np
-
-def power_iteration(A, B, nsim):
-    # Choose a random starting vector
-    b_k = B
-
-    for _ in range(nsim):
-        # Calculate the matrix-by-vector product Ab
-        b_k1 = np.dot(A, b_k)
-
-        # Re normalize the vector
-        b_k = b_k1 / np.linalg.norm(b_k1)
-
-    return b_k
+    import numpy as np
 
 
-def main():
-    A = np.array([[1, 1, 1], [1, 2, 3], [1, 3, 6]])
-    B = np.array([1, 1, 1])
-
-    eigvec = power_iteration(A, B, nsim=100)
-    eigval = np.dot(np.dot(A, eigvec), eigvec)
-
-    print("eigvec: ", eigvec)
-    print("eigval: ", eigval)
-
-    # second eigenvalue
-    A1 = A - eigval * np.outer(eigvec, eigvec)
-    print("A: ", A1)
-
-    eigvec = power_iteration(A1, B, nsim=100)
-    eigval = np.dot(np.dot(A1, eigvec), eigvec)
-
-    print("eigvec: ", eigvec)
-    print("eigval: ", eigval)
-
-    # third eigenvalue
-    A2 = A1 - eigval * np.outer(eigvec, eigvec)
-    print("A: ", A2)
-
-    eigvec = power_iteration(A2, B, nsim=100)
-    eigval = np.dot(np.dot(A2, eigvec), eigvec)
-
-    print("eigvec: ", eigvec)
-    print("eigval: ", eigval)
-
-
-if __name__ == "__main__":
-    main()
+    def power_iteration(A, B, nsim):
+        # Choose a random starting vector
+        b_k = B
+    
+        for _ in range(nsim):
+            # Calculate the matrix-by-vector product Ab
+            b_k1 = np.dot(A, b_k)
+    
+            # Re normalize the vector
+            b_k = b_k1 / np.linalg.norm(b_k1)
+    
+        return b_k
+    
+    
+    def main():
+        A = np.array([[1, 1, 1], [1, 2, 3], [1, 3, 6]])
+        B = np.array([1, 1, 1])
+    
+        eigvec = power_iteration(A, B, nsim=100)
+        eigval = np.dot(np.dot(A, eigvec), eigvec)
+    
+        print("eigvec: ", np.around(eigvec, decimals=3))
+        print("eigval: ", np.around(eigval, decimals=3))
+    
+        # second eigenvalue
+        A1 = A - eigval * np.outer(eigvec, eigvec)
+        print("A: ", np.around(A1, decimals=3))
+    
+        eigvec = power_iteration(A1, B, nsim=100)
+        eigval = np.dot(np.dot(A1, eigvec), eigvec)
+    
+        print("eigvec: ", np.around(eigvec, decimals=3))
+        print("eigval: ", np.around(eigval, decimals=3))
+    
+        # third eigenvalue
+        A2 = A1 - eigval * np.outer(eigvec, eigvec)
+        print("A: ", np.around(A2, decimals=3))
+    
+        eigvec = power_iteration(A2, B, nsim=100)
+        eigval = np.dot(np.dot(A2, eigvec), eigvec)
+    
+        print("eigvec: ", np.around(eigvec, decimals=3))
+        print("eigval: ", np.around(eigval, decimals=3))
+    
+    
+    if __name__ == "__main__":
+        main()    
 \end{lstlisting}
 
 The result for the problem is as follows.
 
 \begin{enumerate}
-    \item [(a)] $\begin{bmatrix} 0.19382266 \\ 0.47224729 \\ 0.8598926 \end{bmatrix}$
-    \item [(b)] $7.872983346207418$
+    \item [(a)] $\begin{bmatrix} 0.194 \\ 0.472 \\ 0.86 \\  \end{bmatrix}$
+    \item [(b)] $7.873$
     \item [(c)] 
-    $A = \begin{bmatrix} 
-        0.70423389 & 0.27936833 & -0.31216389 \\
-        0.27936833 & 0.24418694 & -0.19707639 \\
-        -0.31216389 & -0.19707639 & 0.17859582 
+    $A = \begin{bmatrix}
+            0.704 & 0.279 & -0.312 \\
+            0.279 & 0.244 & -0.197 \\
+            -0.312 & -0.197 & 0.179 \\            
     \end{bmatrix}$
-    \item [(d)] $\begin{bmatrix} 0.81649658 \\ 0.40824829 \\ -0.40824829 \end{bmatrix}, 1.0$
-    \item [(e)] 
+    \item [(d)] $\begin{bmatrix}  0.816 \\  0.408 \\ -0.408 \\ \end{bmatrix}, 1.0$
+    \item [(e)]
     $A = \begin{bmatrix} 
-        0.03756722 & -0.053965 & 0.02116944 \\
-        -0.053965 & 0.07752027 & -0.03040973 \\
-        0.02116944 & -0.03040973 & 0.01192916 
+            0.038 & -0.054 & 0.021 \\
+            -0.054 & 0.078 & -0.03 \\
+            0.021 & -0.03 & 0.012 \\
     \end{bmatrix}$ \\
-    eigvec: $\begin{bmatrix} 0.54384383 \\ -0.78122713 \\ 0.30646053 \end{bmatrix}$ \\
-    eigval: $0.12701665379258312$
+    eigvec: $\begin{bmatrix} 0.544 \\ -0.781 \\ 0.306 \\ \end{bmatrix}$ \\
+    eigval: $0.127$
 \end{enumerate}
 
 \subsection*{11.1.7}
@@ -370,25 +371,25 @@ The result for the problem is as follows.
         \(D_C(B,C) = 1 - \frac{1}{2\sqrt{3}} = \frac{2\sqrt{3}-1}{2\sqrt{3}}\)
     
     \item[(e)]
-        \( AVG(A) = (4+5+5+1+3+2)/6 = 20/6 = 10/3 \)
-        \( AVG(B) = (3+4+3+1+2+1)/6 = 14/6 = 7/3\)
-        \( AVG(C) = (2+1+3+4+5+3)/6 = 18/6 = 3\)
+        \( AVG(A) = (4+5+5+1+3+2)/6 = 20/6 = 10/3 \) \\
+        \( AVG(B) = (3+4+3+1+2+1)/6 = 14/6 = 7/3\) \\
+        \( AVG(C) = (2+1+3+4+5+3)/6 = 18/6 = 3\) \\
 
         The utility matrix becomes:
         \[
         \begin{array}{c|cccccccc}
         & a & b & c & d & e & f & g & h \\
         \hline
-        A & 2/3 & 5/3 & -10/3 & 5/3 & -7/3 & -10/3 & -1/3 & -4/3 \\
-        B & -7/3 & 2/3 & 5/3 & 2/3 & -4/3 & -1/3 & -4/3 & -7/3 \\
-        C & -1 & -3 & -2 & 0 & -3 & 1 & 2 & 0\\
+        A & 2/3 & 5/3 & 0 & 5/3 & -7/3 & 0 & -1/3 & -4/3 \\
+        B & 0 & 2/3 & 5/3 & 2/3 & -4/3 & -1/3 & -4/3 & 0 \\
+        C & -1 & 0 & -2 & 0 & 0 & 1 & 2 & 0\\
         \end{array}
         \]
     \item[(f)]
 
-    \(D_C(A,B) = 1 - \frac{26/9}{\sqrt{320/9}\sqrt{164/9}} =  0.887 \) \\
-    \(D_C(A,C) = 1 - \frac{4}{\sqrt{320/9}\sqrt{28}} = 0.873 \) \\
-    \(D_C(B,C) = 1 - \frac{-2}{\sqrt{164/9}\sqrt{28}} = 1.089 \)
+    \(D_C(A,B) = 1 - \frac{52/9}{\sqrt{120/9}\sqrt{66/9}} =  0.416 \) \\
+    \(D_C(A,C) = 1 - \frac{-4/3}{\sqrt{120/9}\sqrt{10}} = 1.115 \) \\
+    \(D_C(B,C) = 1 - \frac{-19/3}{\sqrt{66/9}\sqrt{10}} = 1.740 \)
 
 \end{enumerate}
 
