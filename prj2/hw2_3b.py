@@ -153,12 +153,12 @@ def item_based(umatrix, umatrix_normed, uid2index, mid2index, user_id):
         where=norms != 0,
     )
     dists = 1 - sims
-    topk_indices = np.argsort(dists, axis=0)[:topk_items_to_average]
+    topk_indices = np.argsort(dists, axis=0)[:, :topk_items_to_average]
 
     umatrix_topk = umatrix[uid, topk_indices + max_idx]
-    topk_rated_item_num = np.count_nonzero(umatrix_topk, axis=0)
+    topk_rated_item_num = np.count_nonzero(umatrix_topk, axis=1)
     mean_rating = np.divide(
-        np.sum(umatrix_topk, axis=0),
+        np.sum(umatrix_topk, axis=1),
         topk_rated_item_num,
         out=np.zeros_like(topk_rated_item_num, dtype=float),
         where=topk_rated_item_num != 0,
