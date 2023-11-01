@@ -82,10 +82,12 @@ def user_based(umatrix, umatrix_normed, uid2index, mid2index, user_id):
     sims = np.divide(
         sims,
         norms,
-        out=np.zeros_like(sims, dtype=float),
+        out=-np.ones_like(sims, dtype=float),
         where=norms != 0,
     )
-    topk_users = np.argsort(sims)[-topk_users_to_average:]
+    sims[uid] = -1
+    dists = 1 - sims
+    topk_users = np.argsort(dists)[:topk_users_to_average]
 
     # Pre-compute the ratings for the user of interest
     user_ratings = umatrix[uid, :max_idx]
@@ -147,22 +149,20 @@ def item_based(umatrix, umatrix_normed, uid2index, mid2index, user_id):
     sims = np.divide(
         sims,
         norms,
-        out=np.zeros_like(sims, dtype=float),
+        out=-np.ones_like(sims, dtype=float),
         where=norms != 0,
     )
-    topk_indices = np.argsort(sims, axis=-1)[-topk_items_to_average:]
+    dists = 1 - sims
+    topk_indices = np.argsort(dists, axis=0)[:topk_items_to_average]
 
-    # get indices without rating for items above num_items_for_prediction
     umatrix_topk = umatrix[uid, topk_indices + max_idx]
     topk_rated_item_num = np.count_nonzero(umatrix_topk, axis=0)
     mean_rating = np.divide(
         np.sum(umatrix_topk, axis=0),
         topk_rated_item_num,
-        out=np.zeros_like(np.sum(umatrix_topk, axis=0), dtype=float),
+        out=np.zeros_like(topk_rated_item_num, dtype=float),
         where=topk_rated_item_num != 0,
     )
-
-    index2mid = {i: mid for mid, i in mid2index.items()}
 
     predicted_ratings = sorted(
         [(rating, index2mid[midx]) for midx, rating in enumerate(mean_rating)],
