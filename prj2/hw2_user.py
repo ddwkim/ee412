@@ -1,15 +1,12 @@
 import numpy as np
 import sys
-import re
 
 # Take average of top-k similar user's ratings
-topk_users_to_average = 300
+topk_users_to_average = 100
 
-topk_genres = 10
 svd_k = 64
-alpha = 4
 
-np.random.seed(2)
+np.random.seed(6)
 
 
 def cosine_dist_matrix(user_features):
@@ -48,6 +45,7 @@ def split_dataset(umatrix, ratio):
     num_test -= umatrix.shape[0]
 
     rc = [[i, j] for i, j in zip(r, c)]
+
     np.random.shuffle(rc)
     rc = rc[:num_test]
     r = [i for i, j in rc]
@@ -56,40 +54,6 @@ def split_dataset(umatrix, ratio):
     train_umatrix[r, c] = 0
 
     return train_umatrix
-
-
-def parse_movie_names(file_name):
-    with open(file_name) as f:
-        lines = f.readlines()
-
-    lines = [line.split(",") for line in lines]
-    yearpat = re.compile(r"\((\d+)\)")
-    lines = [
-        [
-            line[0],
-            line[1],
-            int(re.findall(yearpat, line[1])[0])
-            if re.findall(yearpat, line[1])
-            else None,
-            line[2].strip(),
-        ]
-        for line in lines
-    ]
-    years = []
-    moviedict = {}
-    for line in lines:
-        movieid = int(line[0])
-        moviedict[movieid] = line[1:]
-        if line[2] is not None and line[2] not in years:
-            years.append(line[2])
-
-    years.sort()
-    year_median = years[len(years) // 2]
-    for movieid, (name, year, genre) in moviedict.items():
-        if year is None:
-            moviedict[movieid][1] = year_median
-
-    return moviedict
 
 
 def get_matrix(file_name):
@@ -145,6 +109,8 @@ def perform_svd(umatrix, k):
     u, s, vh = np.linalg.svd(umatrix, full_matrices=False)
     s = np.diag(s)
 
+    # s = s + np.eye(s.shape[0]) * s[k, k]
+
     umatrix_svd = np.dot(np.dot(u[:, :k], s[:k, :k]), vh[:k, :])
     return umatrix_svd
 
@@ -171,110 +137,64 @@ def user_based(
     train_umatrix_normed_svd = perform_svd(train_umatrix_normed, svd_k)
 
     test_umatrix = umatrix - train_umatrix
-    total = np.count_nonzero(test_umatrix)
 
     user_ids, _ = np.nonzero(test_umatrix)
     user_ids = np.unique(user_ids)
 
-    mdict = parse_movie_names(sys.argv[2])
-    genres = set()
-    for name, year, genre in mdict.values():
-        genres.update(genre.split("|"))
-    genres = list(genres)
-
-    user_genre = np.zeros((len(user_ids), len(genres)))
-
-    for i, uid in enumerate(user_ids):
-        mids = np.nonzero(train_umatrix[uid])[0]
-        for idx in mids:
-            mid = index2mid[idx]
-            _, _, genre = mdict[mid]
-            for g in genre.split("|"):
-                user_genre[i, list(genres).index(g)] += 1
-
-    user_genre = normalize_matrix(user_genre)[0]
-    genre_dists = cosine_dist_matrix(user_genre)
     user_dists = cosine_dist_matrix(train_umatrix_normed)
 
-    dists_list = [user_dists, genre_dists]
-    nums = [topk_users_to_average, topk_genres]
-    nums = [min(num, dist.shape[1]) for dist, num in zip(dists_list, nums)]
-    weights = []
     train_mats = [train_umatrix_normed, train_umatrix_normed_svd]
 
-    for dist, num in zip(
-        [user_dists, genre_dists],
-        [topk_users_to_average, topk_genres],
-    ):
-        num = min(num, dist.shape[1])
-        rmse = get_results(
-            [dist], [num], [1], train_mats, user_means, user_stds, test_umatrix
-        )
-        weights.append(1 / rmse**alpha)
-        print(rmse)
-
     rmse = get_results(
-        dists_list,
-        nums,
-        weights,
+        user_dists,
+        topk_users_to_average,
         train_mats,
         user_means,
-        user_stds,
         test_umatrix,
     )
     print(rmse)
 
 
 def get_results(
-    dists_list,
-    nums,
-    weights,
+    dists,
+    num,
     train_mats,
     user_means,
-    user_stds,
     test_umatrix,
 ):
     total = np.count_nonzero(test_umatrix)
 
-    user_ids, _ = np.nonzero(test_umatrix)
+    user_ids, movie_ids = np.nonzero(test_umatrix)
     user_ids = np.unique(user_ids)
+    topk_users = np.argpartition(dists, num)[:, :num]
+
+    train_mats = np.stack(train_mats, axis=-1)
 
     rmse = 0
-    import tqdm
-
-    for uid in tqdm.tqdm(user_ids):
+    for uid in user_ids:
         mids = np.nonzero(test_umatrix[uid])[0]
 
-        # Initialize aggregated ratings and counters for each mid
-        aggregated_ratings = np.zeros(len(mids))
+        topk_users_i = topk_users[uid]
 
-        for dists, weight, num in zip(dists_list, weights, nums):
-            topk_users = np.argpartition(dists, num)[:, :num]
-            topk_users_i = topk_users[uid]
+        topk_rated_item_num = np.count_nonzero(
+            train_mats[topk_users_i][:, mids], axis=0
+        )
 
-            for train_mat in train_mats:
-                # Calculate mean rating for current dist, weighted by its weight
-                topk_rated_item_num = np.count_nonzero(
-                    train_mat[topk_users_i][:, mids], axis=0
-                )
+        mean_ratings = np.divide(
+            np.sum(train_mats[topk_users_i][:, mids], axis=0),
+            topk_rated_item_num,
+            out=np.zeros_like(
+                np.sum(train_mats[topk_users_i][:, mids], axis=0),
+                dtype=float,
+            ),
+            where=topk_rated_item_num != 0,
+        )
 
-                mean_ratings = np.divide(
-                    np.sum(train_mat[topk_users_i][:, mids], axis=0),
-                    topk_rated_item_num,
-                    out=np.zeros_like(
-                        np.sum(train_mat[topk_users_i][:, mids], axis=0),
-                        dtype=float,
-                    ),
-                    where=topk_rated_item_num != 0,
-                )
+        mean_ratings = (
+            mean_ratings.sum(axis=-1) / train_mats.shape[-1] + user_means[uid]
+        )
 
-                # Accumulate weighted ratings and counters
-                aggregated_ratings += mean_ratings * weight / len(train_mats)
-
-        weighted_mean_ratings = aggregated_ratings / np.sum(weights)
-        weighted_mean_ratings = weighted_mean_ratings * user_stds[uid] + user_means[uid]
-
-        rmse += np.sum((test_umatrix[uid, mids] - weighted_mean_ratings) ** 2)
+        rmse += np.sum((test_umatrix[uid, mids] - mean_ratings) ** 2)
     rmse = np.sqrt(rmse / total)
 
     return rmse
@@ -284,7 +204,7 @@ def main():
     umatrix, uid2index, mid2index = get_matrix(sys.argv[1])
     umatrix_normed, user_means, user_stds = normalize_matrix(umatrix)
 
-    train_umatrix = split_dataset(umatrix, 0.1)
+    train_umatrix = split_dataset(umatrix, 0.05)
     train_umatrix_normed, user_means, user_stds = normalize_matrix(train_umatrix)
 
     user_based(
