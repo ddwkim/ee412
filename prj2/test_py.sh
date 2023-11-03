@@ -12,11 +12,13 @@ fi
 # Create a temporary directory for extraction
 temp_dir=$(mktemp -d)
 
+cp "./kmeans.txt" "./ratings.txt" "./ratings_test.txt" "$temp_dir/"
+
 # Extract the tarball to the temporary directory
 tar -xzf "$tarball_name" -C "$temp_dir"
 
 # Verify the necessary files are present
-required_files=("hw2_1.py" "hw2_3b.py" "hw2_3c.py" "kmeans.txt" "ratings.txt" "ratings_test.txt")
+required_files=("hw2_1.py" "hw2_3b.py" "hw2_3c.py")
 for file in "${required_files[@]}"; do
     if [ ! -f "$temp_dir/$file" ]; then
         echo "Error: Required file '$file' is missing in the tarball."
