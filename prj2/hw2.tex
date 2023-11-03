@@ -359,16 +359,16 @@ The result for the problem is as follows.
         Cosine distance is given by:\\
 
         \[
-        D_C(A,B) = 1 - \frac{A \cdot B}{\|A\| \|B\|}
+        D_C(A,B) = acos(\frac{A \cdot B}{\|A\| \|B\|})
         \]
 
         Computing for each pair:\\
 
-        \(D_C(A,B) = 1 - \frac{4}{6} = \frac{1}{3}\)
+        \(D_C(A,B) = acos(\frac{4}{6}) = 0.841\)
 
-        \(D_C(A,C) = 1 - \frac{4}{6} = \frac{1}{3}\)
+        \(D_C(A,C) = acos(\frac{4}{6}) = 0.841\)
 
-        \(D_C(B,C) = 1 - \frac{4}{6} = \frac{1}{3}\)
+        \(D_C(B,C) = acos(\frac{4}{6}) = 0.841\)
     \item[(c)]
         \[
         \begin{array}{c|cccccccc}
@@ -387,11 +387,11 @@ The result for the problem is as follows.
         \(D_J(B,C) = 1 - \frac{1}{6} = \frac{5}{6}\)
     \item[(d)]
 
-        \(D_C(A,B) = 1 - \frac{2}{2\sqrt{3}} = \frac{\sqrt{3}-1}{\sqrt{3}}\)
+        \(D_C(A,B) = acos(\frac{2}{2\sqrt{3}}) = 0.955\)
 
-        \(D_C(A,C) = 1 - \frac{2}{4} = \frac{1}{2}\)
+        \(D_C(A,C) = acos(\frac{2}{4}) = 1.047\)
 
-        \(D_C(B,C) = 1 - \frac{1}{2\sqrt{3}} = \frac{2\sqrt{3}-1}{2\sqrt{3}}\)
+        \(D_C(B,C) = acos(\frac{1}{2\sqrt{3}}) = 1.278\)
     
     \item[(e)]
         \( AVG(A) = (4+5+5+1+3+2)/6 = 20/6 = 10/3 \) \\
@@ -410,9 +410,9 @@ The result for the problem is as follows.
         \]
     \item[(f)]
 
-    \(D_C(A,B) = 1 - \frac{52/9}{\sqrt{120/9}\sqrt{66/9}} =  0.416 \) \\
-    \(D_C(A,C) = 1 - \frac{-4/3}{\sqrt{120/9}\sqrt{10}} = 1.115 \) \\
-    \(D_C(B,C) = 1 - \frac{-19/3}{\sqrt{66/9}\sqrt{10}} = 1.740 \)
+    \(D_C(A,B) = acos(\frac{52/9}{\sqrt{120/9}\sqrt{66/9}}) =  0.9468 \) \\
+    \(D_C(A,C) = acos(\frac{-4/3}{\sqrt{120/9}\sqrt{10}}) = 1.687 \) \\
+    \(D_C(B,C) = acos(\frac{-19/3}{\sqrt{66/9}\sqrt{10}}) = 2.403 \)
 
 \end{enumerate}
 
@@ -455,13 +455,10 @@ The result for the problem is as follows.
     
     \item[(c)]
     Considering null is 0, we have,\\
-    \(D_C(A,B) = 1 - \frac{188/9}{\sqrt{358/9}\sqrt{166/9}} = 0.2288\)\\
-    \(D_C(B,C) = 1 - \frac{18}{\sqrt{166/9}\sqrt{101/4}} = 0.1659\)\\
-    \(D_C(C,A) = 1 - \frac{28}{\sqrt{101/4}\sqrt{358/9}} = 0.1165\)
+    \(D_C(A,B) = acos(\frac{188/9}{\sqrt{358/9}\sqrt{166/9}}) = 0.690\)\\
+    \(D_C(B,C) = acos(\frac{18}{\sqrt{166/9}\sqrt{101/4}}) = 0.584\)\\
+    \(D_C(C,A) = acos(\frac{28}{\sqrt{101/4}\sqrt{358/9}}) = 0.487\)
     
-
-
-
 
 \end{enumerate}
 
