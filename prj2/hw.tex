@@ -65,6 +65,22 @@ The maximum of the editdistance for each element is,
 \end{align*}
 Where the clustroid becomes aaaaaaaa with the minimum of 15.
 
+
+\subsection*{1-(b)}
+% 15840.015935162377
+% 8712.758000610926
+% 4225.773466007263
+% 2018.267391109598
+% 1526.2137994123182
+% 1420.7214130743844
+% 1326.9455957023163
+% 1003.3225742993731
+\includegraphics[scale=0.65]
+The k value with an explanation why it is good for this data.
+The answer is 5, as the difference between the average distance begins to decrease insignificantly (i.e. smaller than 10\%) after k = 5.
+The difference is over 10\% in case of k = 8, but this requires more clusters, increasing model complexity.
+If higher complexity (i.e. more clusters) is desirable, then k = 8 is also a good choice.
+
 \section*{2}
 \subsection*{11.1.7}
 Following is the code for the problem.
@@ -435,6 +451,8 @@ The result for the problem is as follows.
     \(D_C(A,B) = 1 - \frac{188/9}{\sqrt{358/9}\sqrt{166/9}} = 0.2288\)
     \(D_C(B,C) = 1 - \frac{18}{\sqrt{166/9}\sqrt{101/4}} = 0.1659\)
     \(D_C(C,A) = 1 - \frac{28}{\sqrt{101/4}\sqrt{358/9}} = 0.1165\)
+    
+
 
 
 
