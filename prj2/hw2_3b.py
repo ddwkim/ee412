@@ -46,9 +46,7 @@ def get_matrix(file_name):
     # for each row, sum nonzero columns
     row_sums = np.sum(umatrix, axis=1)
     # for each row, subtract mean from nonzero columns
-    row_means = np.divide(
-        row_sums, nnz_cols, out=np.zeros_like(row_sums), where=nnz_cols != 0
-    )
+    row_means = np.divide(row_sums, nnz_cols, out=np.zeros_like(row_sums), where=nnz_cols != 0)
 
     # subtract mean from nonzero columns
     umatrix_normed = umatrix.copy()
@@ -86,6 +84,8 @@ def user_based(umatrix, umatrix_normed, uid2index, mid2index, user_id):
         where=norms != 0,
     )
     sims[uid] = -1
+    sims = np.clip(sims, -1, 1)
+
     dists = 1 - sims
     topk_users = np.argsort(dists)[:topk_users_to_average]
 
@@ -100,9 +100,7 @@ def user_based(umatrix, umatrix_normed, uid2index, mid2index, user_id):
     mean_ratings = np.divide(
         np.sum(umatrix[topk_users][:, not_rated], axis=0),
         topk_rated_item_num,
-        out=np.zeros_like(
-            np.sum(umatrix[topk_users][:, not_rated], axis=0), dtype=float
-        ),
+        out=np.zeros_like(np.sum(umatrix[topk_users][:, not_rated], axis=0), dtype=float),
         where=topk_rated_item_num != 0,
     )
 
@@ -152,8 +150,9 @@ def item_based(umatrix, umatrix_normed, uid2index, mid2index, user_id):
         out=-np.ones_like(sims, dtype=float),
         where=norms != 0,
     )
+    sims = np.clip(sims, -1, 1)
     dists = 1 - sims
-    topk_indices = np.argsort(dists, axis=0)[:, :topk_items_to_average]
+    topk_indices = np.argsort(dists, axis=1)[:, :topk_items_to_average]
 
     umatrix_topk = umatrix[uid, topk_indices + max_idx]
     topk_rated_item_num = np.count_nonzero(umatrix_topk, axis=1)
