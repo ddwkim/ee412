@@ -87,7 +87,7 @@ def user_based(umatrix, umatrix_normed, uid2index, mid2index, user_id):
     sims = np.clip(sims, -1, 1)
 
     dists = 1 - sims
-    topk_users = np.argsort(dists)[:topk_users_to_average]
+    topk_users = np.argsort(dists, kind="stable")[:topk_users_to_average]
 
     # Pre-compute the ratings for the user of interest
     user_ratings = umatrix[uid, :max_idx]
@@ -140,6 +140,7 @@ def item_based(umatrix, umatrix_normed, uid2index, mid2index, user_id):
     uid = uid2index[user_id]
     # dimension for sims is (max_idx, rest of the items)
     sims = np.matmul(umatrix_normed[:, :max_idx].T, umatrix_normed[:, max_idx:])
+
     norms = np.outer(
         np.linalg.norm(umatrix_normed[:, :max_idx], axis=0),
         np.linalg.norm(umatrix_normed[:, max_idx:], axis=0),
@@ -150,8 +151,9 @@ def item_based(umatrix, umatrix_normed, uid2index, mid2index, user_id):
         out=-np.ones_like(sims, dtype=float),
         where=norms != 0,
     )
+
     dists = 1 - sims
-    topk_indices = np.argsort(dists, axis=1)[:, :topk_items_to_average]
+    topk_indices = np.argsort(dists, axis=1, kind="stable")[:, :topk_items_to_average]
 
     umatrix_topk = umatrix[uid, topk_indices + max_idx]
 
