@@ -33,7 +33,7 @@
 
 
 \noindent
-\textbf{20170082 Dongwon Kim EE412 HW\#2}\\
+\textbf{20170082 Dongwon Kim EE412 HW\#3}\\
 
 \noindent
 \section*{1}
@@ -164,46 +164,51 @@ By chain rule,
 \]
 Since the loss is mean squared error,
 \[
-\frac{\partial L}{\partial o_j} = 2(o_j - y_j)
+\frac{\partial L}{\partial o_j} = (o_j - y_j)
 \]
 Note
 \[
 \sigma'(z) = \sigma(z)(1 - \sigma(z))
 \]
-Therefore, the derivative of the output with respect to $z_j$ is
+Therefore, the derivative of the output with respect to $z^2_j$ is
 \[
-\frac{\partial o_j}{\partial z_j} = o_j(1 - o_j)
+\frac{\partial o_j}{\partial z^2_j} = o_j(1 - o_j)
 \]
-Denote the hidden layer output as $h_i$. Then, since $z_j = \sum_{i=1}^{2} w^2_{ij} h_i$,
+Denote the hidden layer output as $h_i$. Then, since $z^2_j = \sum_{i=1}^{2} w^2_{ij} h_i$,
 \[
-\frac{\partial z_j}{\partial w^2_{ij}} = h_i
+\frac{\partial z^2_j}{\partial w^2_{ij}} = h_i
 \]
 Putting it all together for the second layer weights
 \[
-\frac{\partial L}{\partial w^2_{ij}} = 2(o_j - y_j) o_j(1 - o_j) h_i
+\frac{\partial L}{\partial w^2_{ij}} = (o_j - y_j) o_j(1 - o_j) h_i
 \]
 Gradient of the loss with respect to the weights in the first layer $w^1$ is
 \[
 \frac{\partial L}{\partial w^1_{ij}} = 
-\sum_{k=1}^{2} \left( \frac{\partial L}{\partial o_k} \frac{\partial o_k}{\partial h_j} \frac{\partial h_j}{\partial z_j} \frac{\partial z_j}{\partial w^1_{ij}} \right)
+\sum_{k=1}^{2} \left( \frac{\partial L}{\partial o_k} \frac{\partial o_k}{\partial h_j} \frac{\partial h_j}{\partial z^2_j} \frac{\partial z^2_j}{\partial w^1_{ij}} \right)
 \]
+Since the loss is mean squared error,
 \[
-\frac{\partial L}{\partial o_k} = 2(o_k - y_k)
+\frac{\partial L}{\partial o_k} = (o_k - y_k)
 \]
+Since $o_k = \sigma(z^2_k)$, $z^2_k = \sum_{i=1}^{2} w^2_{ik} h_i$,
 \[
 \frac{\partial o_k}{\partial h_i} = w^2_{ik} o_k(1 - o_k)
 \]
-Since $h_j = \sigma(z_j)$,
+Since $h_j = \sigma(z^1_j)$,
 \[
-\frac{\partial h_j}{\partial z_j} = h_j(1 - h_j)
+\frac{\partial h_j}{\partial z^1_j} = h_j(1 - h_j)
 \]
-Since, $z_j = \sum_{i=1}^{2} w^1_{ij} x_i$,
+Since, $z^1_j = \sum_{i=1}^{2} w^1_{ij} x_i$,
 \[
-\frac{\partial z_j}{\partial w^1_{ij}} = x_i
+\frac{\partial z^1_j}{\partial w^1_{ij}} = x_i
 \]
 Putting it all together for the first layer weights
 \[
-\frac{\partial L}{\partial w^1_{ij}} = \sum_{k=1}^{2} 2(o_k - y_k) w^2_{ik} o_k(1 - o_k) h_j(1 - h_j) x_i
+\frac{\partial L}{\partial w^1_{ij}} = \sum_{k=1}^{2} (o_k - y_k) w^2_{ik} o_k(1 - o_k) h_j(1 - h_j) x_i
 \]
+Where $o_k$ is the output of the second layer and $h_j$ is the output of the first layer,
+and $z^k_i$ is the output of the $k$-th layer before the activation function is applied.
+In other words, $o_k = \sigma(z^2_k)$ and $h_j = \sigma(z^1_j)$. 
 
 \end{document}
