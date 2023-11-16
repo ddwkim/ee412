@@ -1,0 +1,209 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{graphicx}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+\begin{document}
+
+
+\noindent
+\textbf{20170082 Dongwon Kim EE412 HW\#2}\\
+
+\noindent
+\section*{1}
+\subsection*{1-(a)}
+
+The Google Matrix becomes,
+
+\[
+A = \begin{bmatrix}
+    \frac{1}{3} & \frac{7}{15} & \frac{1}{15} \\ \\
+    \frac{1}{3} & \frac{1}{15} & \frac{7}{15} \\ \\
+    \frac{1}{3} & \frac{7}{15} & \frac{7}{15}          
+\end{bmatrix}
+\]
+
+\noindent
+Solving using power iteration, we get
+
+\[
+\text{PageRank is } \begin{bmatrix} 0.259 & 0.309 & 0.432 \end{bmatrix}
+\]
+
+\noindent
+The code for the power iteration is as follows.
+
+\begin{lstlisting}[language=Python]
+def main():
+    adj = [
+        [1 / 3, 1 / 3, 1 / 3],
+        [1 / 2, 0, 1 / 2],
+        [0, 1 / 2, 1 / 2],
+    ]
+    M = list(map(list, zip(*adj)))
+    beta = 0.8
+    M = [
+        [beta * x + (1 - beta) / len(adj) for x in row]
+        for row in M
+    ]
+
+    print(M)
+    r = [1 / 3, 1 / 3, 1 / 3]
+    for _ in range(100):
+        r = [
+            sum([M[k][j] * r[j] for j in range(len(M))])
+            for k in range(len(M))
+        ]
+    print(r)
+    Mr = [
+        sum([M[i][j] * r[j] for j in range(len(M))])
+        for i in range(len(M))
+    ]
+    print(Mr)
+
+
+if __name__ == "__main__":
+    main()
+\end{lstlisting}
+
+
+\subsection*{1-(b)}
+\begin{enumerate}
+    \item [\textbf{(a)}] \[
+        \text{PageRank is } \begin{bmatrix} 0.429 & 0.190 & 0.190 & 0.190 \end{bmatrix}
+        \]
+    \item[\textbf{(b)}] \[
+        \text{PageRank is } \begin{bmatrix} 0.386 & 0.171 & 0.271 & 0.171 \end{bmatrix}
+        \]
+\end{enumerate}
+
+\noindent
+The code is as follows.
+\begin{lstlisting}[language=Python]
+def main():
+    adj = [
+        [0, 1 / 3, 1 / 3, 1 / 3],
+        [1 / 2, 0, 0, 1 / 2],
+        [1, 0, 0, 0],
+        [0, 1 / 2, 1 / 2, 0],
+    ]
+    M = list(map(list, zip(*adj)))
+    beta = 0.8
+
+    # case (a)
+    r = [1 / 4, 1 / 4, 1 / 4, 1 / 4]
+    s = [1, 0, 0, 0]
+    for _ in range(100):
+        r_ = r
+        r = [
+            sum([M[k][j] * r[j] for j in range(len(M))])
+            * beta
+            for k in range(len(M))
+        ]
+        r = [
+            r[i] + (1 - beta) * s[i] / sum(s)
+            for i in range(len(M))
+        ]
+    print(r)
+
+    # case (b)
+    r = [1 / 4, 1 / 4, 1 / 4, 1 / 4]
+    s = [1, 0, 1, 0]
+    for _ in range(100):
+        r_ = r
+        r = [
+            sum([M[k][j] * r[j] for j in range(len(M))])
+            * beta
+            for k in range(len(M))
+        ]
+        r = [
+            r[i] + (1 - beta) * s[i] / sum(s)
+            for i in range(len(M))
+        ]
+    print(r)
+
+
+if __name__ == "__main__":
+    main()
+\end{lstlisting}
+
+\noindent
+The code performs power iteration on a uniformly initialized vector. The teleport set is given as s.
+
+\section*{2}
+\subsection*{2-(a)}
+By chain rule,
+\[
+\frac{\partial L}{\partial w^2_{ij}} = \frac{\partial L}{\partial o_j} \frac{\partial o_j}{\partial z_j} \frac{\partial z_j}{\partial w^2_{ij}}
+\]
+Since the loss is mean squared error,
+\[
+\frac{\partial L}{\partial o_j} = 2(o_j - y_j)
+\]
+Note
+\[
+\sigma'(z) = \sigma(z)(1 - \sigma(z))
+\]
+Therefore, the derivative of the output with respect to $z_j$ is
+\[
+\frac{\partial o_j}{\partial z_j} = o_j(1 - o_j)
+\]
+Denote the hidden layer output as $h_i$. Then, since $z_j = \sum_{i=1}^{2} w^2_{ij} h_i$,
+\[
+\frac{\partial z_j}{\partial w^2_{ij}} = h_i
+\]
+Putting it all together for the second layer weights
+\[
+\frac{\partial L}{\partial w^2_{ij}} = 2(o_j - y_j) o_j(1 - o_j) h_i
+\]
+Gradient of the loss with respect to the weights in the first layer $w^1$ is
+\[
+\frac{\partial L}{\partial w^1_{ij}} = 
+\sum_{k=1}^{2} \left( \frac{\partial L}{\partial o_k} \frac{\partial o_k}{\partial h_j} \frac{\partial h_j}{\partial z_j} \frac{\partial z_j}{\partial w^1_{ij}} \right)
+\]
+\[
+\frac{\partial L}{\partial o_k} = 2(o_k - y_k)
+\]
+\[
+\frac{\partial o_k}{\partial h_i} = w^2_{ik} o_k(1 - o_k)
+\]
+Since $h_j = \sigma(z_j)$,
+\[
+\frac{\partial h_j}{\partial z_j} = h_j(1 - h_j)
+\]
+Since, $z_j = \sum_{i=1}^{2} w^1_{ij} x_i$,
+\[
+\frac{\partial z_j}{\partial w^1_{ij}} = x_i
+\]
+Putting it all together for the first layer weights
+\[
+\frac{\partial L}{\partial w^1_{ij}} = \sum_{k=1}^{2} 2(o_k - y_k) w^2_{ik} o_k(1 - o_k) h_j(1 - h_j) x_i
+\]
+
+\end{document}
