@@ -1,6 +1,7 @@
 import numpy as np
 import sys
 from itertools import combinations
+import tqdm
 
 
 # Graph class
@@ -47,19 +48,20 @@ def random_walk(graph, start, length=5):
 # When sampling next node, visit the node with the smallest index
 # Note that it returns the trajectory of walker
 # so that same node can be visited multiple times
-def node2vec_walk_dfs(graph, start, length=7):
+def node2vec_walk_dfs(graph, start, length=5):
     visited = set()
     path = []
 
     def dfs_util(v):
+        if len(path) == length:
+            return
+
         visited.add(v)
         path.append(v)
         for neighbor in graph.neighbors(v):
             if neighbor not in visited:
                 dfs_util(neighbor)
                 path.append(v)  # Add the node again when returning back
-            if len(path) == length:
-                return
 
     dfs_util(start)
     return path
@@ -77,14 +79,40 @@ def train_skipgram(walks, n_nodes, dim=128, lr=0.01, window=2, epochs=3):
     W2 = np.random.randn(dim, n_nodes)
 
     for _ in range(epochs):
-        for i in range(len(walks)):
-            ctx = walks[i][max(0, i - window) : min(i + window + 1, len(walks))]
-            for x, y in combinations(ctx, 2):
-                prob = np.exp(W1[x - 1] @ W2)  # (n_nodes,)
-                prob /= prob.sum()
-                prob[y - 1] -= 1
-                W2 -= lr * np.outer(W1[x - 1], prob)
-                W1[x - 1] -= lr * (W2 @ prob)
+        # for i in tqdm.tqdm(range(len(walks))):
+        #     ctx = walks[i][max(0, i - window) : min(i + window + 1, len(walks))]
+        # for x, y in combinations(ctx, 2):
+        #     prob = np.exp(W1[x - 1] @ W2)  # (n_nodes,)
+        #     prob /= prob.sum()
+        #     prob[y - 1] -= 1
+        #     W2 -= lr * np.outer(W1[x - 1], prob)
+        #     W1[x - 1] -= lr * (W2 @ prob)
+        for walk in tqdm.tqdm(walks):
+            for i in range(len(walk)):
+                center_word = walk[i]
+                context_indices = (
+                    walk[max(0, i - window) : i]
+                    + walk[i + 1 : min(i + window + 1, len(walk))]
+                )
+                context_indices = np.array(context_indices)
+
+                # Forward pass
+                h = W1[center_word - 1]
+                u = np.matmul(W2.T, h)
+                u = np.exp(u - np.max(u))
+                y_pred = u / np.sum(u)
+
+                # Calculate error
+                e = y_pred
+                e[context_indices - 1] -= 1
+
+                # Backward pass
+                grad_W2 = np.outer(h, e)
+                grad_W1 = np.matmul(W2, e)
+
+                # Update weights
+                W2 -= lr * grad_W2
+                W1[center_word - 1] -= lr * grad_W1
 
     return W1, W2
 
@@ -106,7 +134,9 @@ def main():
     # Parse edges from the command line file path ======================
     with open(sys.argv[1], "rt") as f:
         for line in f:
-            edges.append(tuple(map(int, line.split())))
+            edge = tuple(map(int, line.split()))
+            if edge not in edges:
+                edges.append(edge)
     # ====================================================================
 
     # Update graph
