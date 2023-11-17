@@ -80,11 +80,11 @@ def train_skipgram(walks, n_nodes, dim=128, lr=0.01, window=2, epochs=3):
         for i in range(len(walks)):
             ctx = walks[i][max(0, i - window) : min(i + window + 1, len(walks))]
             for x, y in combinations(ctx, 2):
-                prob = np.exp(W1[x] @ W2)  # (n_nodes,)
+                prob = np.exp(W1[x - 1] @ W2)  # (n_nodes,)
                 prob /= prob.sum()
-                prob[y] -= 1
-                W2 -= lr * np.outer(W1[x], prob)
-                W1[x] -= lr * (W2 @ prob)
+                prob[y - 1] -= 1
+                W2 -= lr * np.outer(W1[x - 1], prob)
+                W1[x - 1] -= lr * (W2 @ prob)
 
     return W1, W2
 
