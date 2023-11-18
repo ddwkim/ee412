@@ -44,19 +44,17 @@ class Fully_Connected_Layer:
     def Backward(self, Input, Label, Output):
         """Implement backward propagation"""
         """Update parameters using gradient descent"""
-        o, z2, h, z1 = Output
+        o, _, h, z1 = Output
 
         dL_dW2 = np.matmul(h.T, (o - Label) * o * (1 - o))
         dL_db2 = np.sum((o - Label) * o * (1 - o), axis=0)
 
         dL_dW1 = np.matmul(
             Input.T,
-            np.matmul((o - Label) * o * (1 - o), self.W2.T)
-            * (z1 > 0),
+            np.matmul((o - Label) * o * (1 - o), self.W2.T) * (z1 > 0),
         )
         dL_db1 = np.sum(
-            np.matmul((o - Label) * o * (1 - o), self.W2.T)
-            * (z1 > 0),
+            np.matmul((o - Label) * o * (1 - o), self.W2.T) * (z1 > 0),
             axis=0,
         )
 
@@ -69,8 +67,7 @@ class Fully_Connected_Layer:
         Output = self.Forward(Input)
         if DEBUG:
             accuracy = np.sum(
-                np.argmax(Output[0], axis=1)
-                == np.argmax(Label, axis=1)
+                np.argmax(Output[0], axis=1) == np.argmax(Label, axis=1)
             ) / len(Label)
             print(f"Train Accuracy: {accuracy:.4f}")
 
@@ -97,9 +94,7 @@ def read_mnist_data(filename):
             label.append(int(float(row[-1])))
             data.append(list(map(float, row[:-1])))
     data = np.array(data)
-    label = np.array(
-        one_hot_encoding(label, max(label) + 1)
-    )
+    label = np.array(one_hot_encoding(label, max(label) + 1))
 
     return data, label
 
@@ -130,16 +125,14 @@ def main():
         # Network.UpdateLR()
         o, *_ = Network.Forward(test_data)
         test_acc = np.sum(
-            np.argmax(o, axis=1)
-            == np.argmax(test_label, axis=1)
+            np.argmax(o, axis=1) == np.argmax(test_label, axis=1)
         ) / len(test_data)
         if DEBUG:
             print(f"Test Accuracy: {test_acc:.4f}")
 
     train_acc = Network.Forward(train_data)[0]
     train_acc = np.sum(
-        np.argmax(train_acc, axis=1)
-        == np.argmax(train_label, axis=1)
+        np.argmax(train_acc, axis=1) == np.argmax(train_label, axis=1)
     ) / len(train_data)
 
     print(f"{train_acc:.3f}")

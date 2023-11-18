@@ -7,24 +7,6 @@ NUM_ITER = 50
 NUM_PRINT = 10
 
 
-def pagerank(rdd):
-    num_pages = rdd.count()
-    ranks = rdd.map(lambda x: (x[0], 1 / num_pages))
-
-    for _ in range(NUM_ITER):
-        contribs = rdd.join(ranks).flatMap(
-            lambda x: ((dest, x[1][1] / len(x[1][0])) for dest in x[1][0])
-        )
-
-        ranks = contribs.reduceByKey(lambda x, y: x + y)
-
-        ranks = ranks.mapValues(
-            lambda rank: (1 - BETA) / num_pages + BETA * rank
-        )
-
-    return ranks
-
-
 def main():
     conf = SparkConf()
     sc = SparkContext(conf=conf)
@@ -37,9 +19,19 @@ def main():
     rdd = rdd.reduceByKey(lambda x, y: x + y)
     rdd = rdd.map(lambda x: (x[0], sorted(list(set(x[1])))))
 
-    rdd = rdd.map(lambda x: (x[0], x[1], 1 / len(x[1])))
+    num_nodes = rdd.count()
+    ranks = rdd.map(lambda x: (x[0], 1 / num_nodes))
 
-    ranks = pagerank(rdd)
+    for _ in range(NUM_ITER):
+        inflows = rdd.join(ranks).flatMap(
+            lambda x: ((dest, x[1][1] / len(x[1][0])) for dest in x[1][0])
+        )
+
+        ranks = inflows.reduceByKey(lambda x, y: x + y)
+
+        ranks = ranks.mapValues(
+            lambda rank: (1 - BETA) / num_nodes + BETA * rank
+        )
 
     top10 = ranks.top(NUM_PRINT, key=lambda x: x[1])
     for i in range(NUM_PRINT):
