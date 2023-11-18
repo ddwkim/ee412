@@ -7,19 +7,13 @@ NUM_ITER = 50
 NUM_PRINT = 10
 
 
-def compute_contribs(dests, rank):
-    num_dests = len(dests)
-    for dest in dests:
-        yield (dest, rank / num_dests)
-
-
 def pagerank(rdd):
     num_pages = rdd.count()
     ranks = rdd.map(lambda x: (x[0], 1 / num_pages))
 
     for _ in range(NUM_ITER):
         contribs = rdd.join(ranks).flatMap(
-            lambda x: compute_contribs(x[1][0], x[1][1])
+            lambda x: ((dest, x[1][1] / len(x[1][0])) for dest in x[1][0])
         )
 
         ranks = contribs.reduceByKey(lambda x, y: x + y)
