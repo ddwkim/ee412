@@ -110,7 +110,7 @@ def main():
 
     """Train the network for the number of iterations"""
     """Implement function to measure the accuracy"""
-    for i in range(NUM_EPOCHS):
+    for _ in range(NUM_EPOCHS):
         # shuffle
         idx = np.arange(len(train_data))
         np.random.shuffle(idx)
@@ -137,7 +137,7 @@ def main():
 
     print(f"{train_acc:.3f}")
     print(f"{test_acc:.3f}")
-    print(f"{NUM_EPOCHS*len(train_data)}")
+    print(f"{NUM_EPOCHS*len(train_data)//BSZ}")
     print(f"{LR}")
 
 
