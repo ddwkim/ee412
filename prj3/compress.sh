@@ -12,6 +12,10 @@ files=(
 # Define the tarball name
 tarball_name="20170082_hw3.tar.gz"
 
+if [ -f "$tarball_name" ]; then
+    rm "$tarball_name"
+fi
+
 # Create the tarball with gzip compression
 tar -czvf "$tarball_name" "${files[@]}"
 
