@@ -93,11 +93,11 @@ def main():
     for edge in edges:
         graph.add_edge(*edge)
 
-    walks_dfs = [node2vec_walk_dfs(graph, node) for node in graph.adj_list]
+    walks_dfs = [node2vec_walk_dfs(graph, node) for node in sorted(list(graph.adj_list.keys()))]
 
     embeddings_dfs = train_skipgram(walks_dfs, len(graph.adj_list))
 
-    for e in embeddings_dfs[0]:
+    for e in [embeddings_dfs[0][4], embeddings_dfs[0][9]]:
         print(f"{e[0]:.5f}")
 
 
